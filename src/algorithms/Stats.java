@@ -14,7 +14,7 @@ import java.util.OptionalDouble;
 
 import supportGUI.Circle;
 
-public class TestQuality {
+public class Stats {
 
 	public static double areaCircle(Circle c) {
 		return c.getRadius()*c.getRadius()*Math.PI;
@@ -59,7 +59,7 @@ public class TestQuality {
 	
 	
 	
-	
+	//listPointsFromFile:String --> ArrayList<Point>
 	public static ArrayList<Point> listPointsFromFile(String filename){
 		ArrayList<Point> points = new ArrayList<>();
         BufferedReader input;
@@ -83,43 +83,12 @@ public class TestQuality {
 		return points;
 		
 	}
-	/*
-	public static void readFile(String filename) {
-        ArrayList<Point> points = new ArrayList<>();
-        BufferedReader input;
-		try {
-			input = new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
-		    String line;
-			try {
-				while((line = input.readLine()) != null) {
-					String[] coordinates = line.split("\\s+");
-					 points.add(new Point(Integer.parseInt(coordinates[0]), Integer.parseInt(coordinates[1])));	
-				}
-				 input.close();
-			} catch (NumberFormatException | IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		DefaultTeam dt= new DefaultTeam();
-		Circle cMinRitter= dt.calculCercleMin(points);
-		ArrayList<Point> envConvexHull=dt.enveloppeConvexe(points);
-		double quality= qualityCircle(cMinRitter,envConvexHull);
-		
-		//Path path = Paths.get(filename);
-		//System.out.println("file: "+path.getFileName() +" | Quality= "+quality);
-
-
-    }
-    */
+	
+    //qualityCircleSamples: void-->Map<Integer,Double>
 	// samples from  Steven Varoumas
-	// integer: numéro de l'instance de test, Double: qualité de l'instance de test
+	// Integer: numéro de l'instance de test, Double: qualité de cercle minimum l'instance de test
 	public static Map<Integer,Double> qualityCircleSamples(){
-		DefaultTeam dt= new DefaultTeam();
+		Algorithmes dt= new Algorithmes();
 		Map<Integer,Double> res= new HashMap<>();
 		for(int i=2;i<=1664;i++) {
 			String filename="F:\\Programmation\\ALGAVRENDU\\Varoumas_benchmark\\samples\\test-"+i+".points";
@@ -132,8 +101,11 @@ public class TestQuality {
 		return res;
 	}
 	
+	//qualityRectangleSamples: void-->Map<Integer,Double>
+	// samples from  Steven Varoumas
+	// Integer: numéro de l'instance de test, Double: qualité de rectangle minimum sur l'instance de test 
 	public static Map<Integer,Double> qualityRectangleSamples(){
-		DefaultTeam dt= new DefaultTeam();
+		Algorithmes dt= new Algorithmes();
 		Map<Integer,Double> res= new HashMap<>();
 		for(int i=2;i<=1664;i++) {
 			String filename="F:\\Programmation\\ALGAVRENDU\\Varoumas_benchmark\\samples\\test-"+i+".points";
@@ -145,37 +117,67 @@ public class TestQuality {
 		}
 		return res;
 	}
-	// valeur moyenne d'une liste de double
-	public static double getAverageValue(ArrayList<Double> q) {
+	
+	//getAverageValue: ArrayList<Double> --> Double
+	// valeur moyenne d'une liste de Double
+	public static Double getAverageValue(ArrayList<Double> q) {
 		OptionalDouble average = q
 	            .stream()
 	            .mapToDouble(a -> a)
 	            .average();
 		return average.getAsDouble();
 	}
+	//timeCircleSamples: void-->Map<Integer,Double>
+	//map qui associe chaque fichier avec leur temps d'execution(en microsecondes) pour cercle minimum(Ritter)
+	public static Map<Integer,Double> timeCircleSamples(){
+		Algorithmes dt= new Algorithmes();
+		Map<Integer,Double> res= new HashMap<>();
+		for(int i=2;i<=1664;i++) {
+			String filename="F:\\Programmation\\ALGAVRENDU\\Varoumas_benchmark\\samples\\test-"+i+".points";
+			ArrayList<Point> points=listPointsFromFile(filename);
+			long startTime = System.nanoTime();
+			Circle cMinRitter= dt.calculCercleMin(points);
+			long stopTime = System.nanoTime();
+			res.put(i, (stopTime - startTime)/1000.0);
+		}
+		return res;
+	}
+	
+	//timeRectangleSamples: void-->Map<Integer,Double>
+	//map qui associe chaque fichier avec leur temps d'execution(en microsecondes) pour rectangle minimum(Toussaint)
+		public static Map<Integer,Double> timeRectangleSamples(){
+			Algorithmes dt= new Algorithmes();
+			Map<Integer,Double> res= new HashMap<>();
+			for(int i=2;i<=1664;i++) {
+				String filename="F:\\Programmation\\ALGAVRENDU\\Varoumas_benchmark\\samples\\test-"+i+".points";
+				ArrayList<Point> points=listPointsFromFile(filename);
+				long startTime = System.nanoTime();
+				ArrayList<Point2D> MinRecToussaint= dt.rectangleMin(points);
+				long stopTime =System.nanoTime();
+				res.put(i, (stopTime - startTime)/1000.0);
+			}
+			return res;
+		}
+	
 	public static void main(String[] args) {
+		 Map<Integer,Double> timeToussaint=timeRectangleSamples();
+		 Map<Integer,Double> timeRitter=timeCircleSamples();
+		 ArrayList<Double> averageTimeRitter = new ArrayList<Double>(timeRitter.values());
+		 ArrayList<Double> averageTimeToussaint = new ArrayList<Double>(timeToussaint.values());
+		 System.out.println("average execution time Ritter = "+ getAverageValue(averageTimeRitter)+" microseconds");
+		 System.out.println("average execution time Toussaint = "+getAverageValue(averageTimeToussaint)+" microseconds");
 		
 		 Map<Integer,Double> mpR=qualityRectangleSamples();
 		 Map<Integer,Double> mpC=qualityCircleSamples();
 	     ArrayList<Double> qualityRectList = new ArrayList<Double>(mpR.values());
 	     ArrayList<Double> qualityCircleList = new ArrayList<Double>(mpC.values());
-	     
 	     double averageQualityCircle=getAverageValue(qualityCircleList);
 	     double averageQualityRectangle=getAverageValue(qualityRectList);
-	     
 	     System.out.println("average Quality Circle = "+averageQualityCircle);
 	     System.out.println("average Quality Rectangle = "+averageQualityRectangle);
 
 		 
-		/*
-		DefaultTeam dt= new DefaultTeam();
-		ArrayList<Point> points=listPointsFromFile("F:\\Programmation\\ALGAVRENDU\\Varoumas_benchmark\\samples\\test-162.points");
-		Point2D.Double[] minimum =RotatingCalipers.getMinimumBoundingRectangle(points);
-		ArrayList<Point2D> res=dt.rectangleMin(points);
-		System.out.println(areaRectangle(res));
-		double quality= qualityRectangle(res,dt.enveloppeConvexe(points));
-		System.out.println("quality: "+quality);
-		*/
+		
 		 
 	}
 	

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import supportGUI.Circle;
 
-public class DefaultTeam {
+public class Algorithmes {
     //calculCercleMin: ArrayList<Point> --> Circle
     //renvoie un cercle couvrant tout point de la liste, de rayon minimum.
     //Algorithme Ritter
@@ -125,6 +125,7 @@ public class DefaultTeam {
         return (0<l1 && l1<1 && 0<l2 && l2<1 && 0<l3 && l3<1);
     }
     
+    //rectangleMin: ArrayList<Point> --> ArrayList<Point2D>
     //Algorithme Toussaint pour rectangle min
     public ArrayList<Point2D> rectangleMin(ArrayList<Point> points){
     	ArrayList<Point2D> res= new ArrayList<Point2D>();
